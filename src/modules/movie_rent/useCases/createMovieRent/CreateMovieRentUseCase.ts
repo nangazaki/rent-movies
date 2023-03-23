@@ -1,10 +1,10 @@
-import { AppError } from "./../../../../errors/error";
 import { prisma } from "../../../../prisma/client";
+import { AppError } from "./../../../../errors/error";
 import { CreateMovieRentDTO } from "./../../dtos/createMovieRentDTO";
 
 export class CreateMovieRentUseCase {
-  async execute({ userId, movieId }: CreateMovieRentDTO): Promise<void> {
-    // Verificar se o filme existe
+  async execute({ movieId, userId }: CreateMovieRentDTO): Promise<void> {
+    // Verify if the movie exists
     const movieExists = await prisma.movie.findUnique({
       where: {
         id: movieId,
@@ -15,7 +15,7 @@ export class CreateMovieRentUseCase {
       throw new AppError("Movie does not exists!");
     }
 
-    // Verificar se o filme nao esta alugado para outra pessoa
+    // Verify if the movie did rent for another person
     const movieAlreadyRented = await prisma.movieRent.findFirst({
       where: {
         movieId,
@@ -26,7 +26,7 @@ export class CreateMovieRentUseCase {
       throw new AppError("Movie already rented!");
     }
 
-    // Verificar se o usario existe
+    // Verify if the user exists
     const userExists = await prisma.user.findUnique({
       where: {
         id: userId,
@@ -37,7 +37,7 @@ export class CreateMovieRentUseCase {
       throw new AppError("User does not exists!");
     }
 
-    // Criar a locacao
+    // Create a movie rental
     await prisma.movieRent.create({
       data: {
         movieId,
